@@ -1,0 +1,40 @@
+name: pytest
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports: ["5432:5432"]
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.10
+          cache: "poetry"
+
+      - name: Install dependencies
+        run: |
+          poetry install
+
+      - name: Test with pytest
+        env:
+          DB_URL: "postgres://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}"
+          PNW_API_KEY: ${{ secrets.PNW_API_KEY }}
+          PNW_BOT_KEY: ${{ secrets.PNW_BOT_KEY }}
+        run: |
+          poetry run python -m pytest
