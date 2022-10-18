@@ -1,9 +1,6 @@
 [tool.poetry]
-name = "pnwapi-py"
-packages = [
-    { include = "pnwapi" },
-]
-version = "0.0.1"
+name = "pnwapi"
+version = "0.0.2"
 description = ""
 authors = ["Christian <59421913+Cikmo@users.noreply.github.com>"]
 readme = "README.md"
