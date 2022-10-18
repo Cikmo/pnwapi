@@ -12,7 +12,6 @@ project = 'pnwapi'
 copyright = '2022, Cikmo'
 author = 'Cikmo'
 release = pnwapi_version
-version = pnwapi_version
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
