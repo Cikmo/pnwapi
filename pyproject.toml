@@ -1,5 +1,8 @@
 [tool.poetry]
 name = "pnwapi-py"
+packages = [
+    { include = "pnwapi" },
+]
 version = "0.0.1"
 description = ""
 authors = ["Christian <59421913+Cikmo@users.noreply.github.com>"]
