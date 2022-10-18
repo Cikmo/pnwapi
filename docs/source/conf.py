@@ -6,12 +6,12 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-from pnwapi import __version__ as pnwapi_version
+#from pnwapi import __version__ as pnwapi_version
 
 project = 'pnwapi'
 copyright = '2022, Cikmo'
 author = 'Cikmo'
-release = pnwapi_version
+#release = pnwapi_version
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
