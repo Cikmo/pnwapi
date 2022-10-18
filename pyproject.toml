@@ -7,6 +7,8 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
+tortoise = "^0.1.1"
+pnwkit-py = "^2.5.4"
 
 
 [tool.poetry.group.dev.dependencies]
