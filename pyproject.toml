@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pnwapi"
-version = "0.0.2"
+version = "0.0.0" # Placeholder. Version is set by GitHub releases, and automatically deployed to PyPI.
 description = ""
 authors = ["Christian <59421913+Cikmo@users.noreply.github.com>"]
 readme = "README.md"
