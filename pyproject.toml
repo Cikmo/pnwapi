@@ -9,6 +9,7 @@ readme = "README.md"
 python = "^3.10"
 tortoise = "^0.1.1"
 pnwkit-py = "^2.5.4"
+singleton-decorator = "^1.0.0"
 
 
 [tool.poetry.group.dev.dependencies]
