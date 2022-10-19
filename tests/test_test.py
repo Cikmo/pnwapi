@@ -1,4 +1,4 @@
-import pnwapi.pnw
+import pnwapi.pnwapi
 import pytest
 import logging
 import asyncio
