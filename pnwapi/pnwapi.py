@@ -9,10 +9,6 @@ from tortoise import Tortoise
 logger = logging.getLogger(__name__)
 
 
-def argh():
-    logger.info("hey there m8")
-
-
 class Pnwapi:
     def __init__(self):
         self._PNW_API_KEY: str
