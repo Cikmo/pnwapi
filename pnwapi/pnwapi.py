@@ -58,9 +58,3 @@ class Pnwapi:
             # await Tortoise.generate_schemas()
 
         return pnwapi
-
-
-async def test():
-    await Pnwapi.init("sqlite://:memory:", "1241521525", "1221531527")
-
-asyncio.run(test())
