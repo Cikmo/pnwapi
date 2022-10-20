@@ -1,3 +1,1 @@
-# conftest.py
-
-from .fixtures import logger
+from .fixtures import initialize_tests, logger, event_loop
