@@ -5,35 +5,32 @@ import sys
 import logging
 
 from tortoise import Tortoise
+from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)
 
 
 class Pnwapi:
-    def __init__(self):
-        self._PNW_API_KEY: str
+    """
+    The Pnwapi class is a singleton class that is used to initialize the pnwapi library.
+    """
+    _inited: bool = False
 
-        self._api: pnwkit.QueryKit
+    api_key: str
+    bot_key: str | None = None
+    db_url: str
+
+    api: pnwkit.QueryKit
+
+    def __init__(self):
+        # If a class instance is attempted to be created, raise an error.
+        raise RuntimeError(
+            "Pnwapi cannot be instantiated as an instance. Use Pnwapi.init() instead.")
 
     @classmethod
-    async def init(cls, db_url: str,
-                   pnw_api_key: str,
-                   pnw_bot_key: str = None) -> "Pnwapi":
-        """
-        Initialize pnwapi. This creates a singleton instance of the Pnw class, which can be accessed via the pnwapi.Pnw object.
-
-        Args:
-            db_url: The connection string for the database. See https://tortoise-orm.readthedocs.io/en/latest/databases.html#db-url for more information.
-            pnw_api_key: The PnW API key to use for API requests.
-            pnw_bot_key: The PnW bot key needed for certain PUT API requests. Defaults to None.
-
-        Returns:
-            A reference to the :class:`~pnwapi.pnw.Pnw` singleton instance.
-        """
-        pnwapi = cls()
-        pnwapi._PNW_API_KEY = pnw_api_key
-
-        pnwapi._api = pnwkit.QueryKit(pnw_api_key, pnw_bot_key)
+    async def _init(cls, db_url: str,
+                    pnw_api_key: str,
+                    pnw_bot_key: str = None) -> None:
 
         # Only initialize the DB if we're not in a test environment.
         # Tests use a seperate initializer found in the `tests/fixtures.py` file.
@@ -45,8 +42,8 @@ class Pnwapi:
                     'default': db_url
                 },
                 'apps': {
-                    'pnwdb': {
-                        'models': ['pnwdb.models'],
+                    'pnwapi': {
+                        'models': ['pnwapi.models'],
                         'default_connection': 'default',
                     }
                 },
@@ -54,7 +51,30 @@ class Pnwapi:
                 'timezone': 'UTC'
             }
 
-            # await Tortoise.init(config=tortoise_config)
-            # await Tortoise.generate_schemas()
+            await Tortoise.init(config=tortoise_config)
+            await Tortoise.generate_schemas()
 
-        return pnwapi
+        else:
+            logger.warning(
+                "This is a test environment. Skipping DB initialization.")
+
+        cls.api_key = pnw_api_key
+        cls.bot_key = pnw_bot_key
+        cls.db_url = db_url
+        cls.api = pnwkit.QueryKit(pnw_api_key, pnw_bot_key)
+
+        cls._inited = True
+
+
+async def init(db_url: str,
+               pnw_api_key: str,
+               pnw_bot_key: str = None) -> None:
+    """
+    Initialize pnwapi. This creates a singleton instance of the Pnw class, which can be accessed via the pnwapi.Pnw object.
+
+    Args:
+        db_url: The connection string for the database. See https://tortoise-orm.readthedocs.io/en/latest/databases.html#db-url for more information.
+        pnw_api_key: The PnW API key to use for API requests.
+        pnw_bot_key: The PnW bot key needed for certain PUT API requests. Defaults to None.
+    """
+    await Pnwapi._init(db_url, pnw_api_key, pnw_bot_key)
