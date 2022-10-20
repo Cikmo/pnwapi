@@ -1,13 +1,43 @@
-.. pnwapi documentation master file, created by
-   sphinx-quickstart on Tue Oct 18 17:36:19 2022.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+===============
+ Pnwapi
+===============
 
-Welcome to pnwapi's documentation!
-==================================
+Pnwapi is an easy to use async API wrapper for the Politics and War API.
+
+Installation
+------------
+.. code-block:: bash
+
+    pip install pnwapi
+
+Usage
+-----
+.. code-block:: python
+
+   import asyncio
+   from pnwapi import Pnwapi
+
+   async def main():
+      pnw = await Pnwapi.init(
+         pnw_api_key="your_api_key",
+         pnw_bot_key="your_bot_key", # Optional
+         db_url="postgresql://user:password@localhost:5432/pnwapi",
+      )
+      nation = await pnw.get.nation(1)
+      print(nation.name)
+
+      for alliance_member in nation.get.alliance().members:
+         print(alliance_member.name)
+      
+   if __name__ == "__main__":
+         asyncio.run(main())
+
+.. class:: center
+
+hello, how are you?
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents:
 
    api/index
