@@ -27,18 +27,18 @@ def initialize_tests(request):
             initializer(["tests.testmodels"], db_url=db_url, app_label="pnwdb")
             request.addfinalizer(finalizer)
             log.info("Initialized test Tortoise-ORM.")
-        except (DBConnectionError, OperationalError) as e:
+        except Exception as e:
             if failed is False and db_url != "sqlite://:memory:":
                 log.warning(
                     "Failed to initialize Tortoise-ORM using the DB_URL environment variable. Falling back to sqlite://:memory:.")
                 failed = True
+                db_url = "sqlite://:memory:"
                 continue
-
-            log.error(
-                f"Failed to initialize Tortoise-ORM using {db_url}.")
-            raise e
-        finally:
-            break
+            else:
+                log.warning(
+                    f"Failed to initialize Tortoise-ORM using {db_url}.")
+                raise e
+        break
 
 
 @pytest.fixture(scope='session')
