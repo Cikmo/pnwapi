@@ -274,7 +274,7 @@ testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "pnwkit-py"
-version = "2.5.6"
+version = "2.5.7"
 description = "A Python wrapper for the Politics and War API."
 category = "main"
 optional = false
@@ -1072,8 +1072,8 @@ pluggy = [
     {file = "pluggy-1.0.0.tar.gz", hash = "sha256:4224373bacce55f955a878bf9cfa763c1e360858e330072059e10bad68531159"},
 ]
 pnwkit-py = [
-    {file = "pnwkit-py-2.5.6.tar.gz", hash = "sha256:2af00148da8462543a9089824c1f818d3af826e2d540f580b4746da5b2f42633"},
-    {file = "pnwkit_py-2.5.6-py3-none-any.whl", hash = "sha256:20ffa0b2533f83f2d717877067ce03f5a1141b5ebeeccd2e7227eb0cc35b40aa"},
+    {file = "pnwkit-py-2.5.7.tar.gz", hash = "sha256:8da45aeb5f11fa5b55c544e0459b571051c6ebcc12c627411bef5b82249e0ae6"},
+    {file = "pnwkit_py-2.5.7-py3-none-any.whl", hash = "sha256:818a8494eee710069da3ba29e89a6dc3f332e34d7bb613f1756892fd84c63da3"},
 ]
 py = [
     {file = "py-1.11.0-py2.py3-none-any.whl", hash = "sha256:607c53218732647dff4acdfcd50cb62615cedf612e72d1724fb1a0cc6405b378"},
