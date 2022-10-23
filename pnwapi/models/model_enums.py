@@ -67,3 +67,33 @@ class TreatyTypeEnum(str, Enum):
     ODoAP = "ODoAP"
     MDP = "MDP"
     MDoAP = "MDoAP"
+
+
+class WarAttackTypeEnum(str, Enum):
+    GROUND = "GROUND"
+    AIR_INFRA = "AIRVINFRA"
+    AIR_SOLDIERS = "AIRVSOLDIERS"
+    AIR_TANKS = "AIRVTANKS"
+    AIR_MONEY = "AIRVMONEY"
+    AIR_AIR = "AIRVAIR"
+    NAVAL = "NAVAL"
+    MISSILE = "MISSILE"
+    MISSILE_FAIL = "MISSILE_FAIL"
+    NUKE = "NUKE"
+    NUKE_FAIL = "NUKE_FAIL"
+    FORTIFY = "FORTIFY"
+    PEACE = "PEACE"
+    VICTORY = "VICTORY"
+    ALLIANCELOOT = "ALLIANCELOOT"
+
+
+class WarAttackOutcomeEnum(int, Enum):
+    IMMENSE_TRIUMPH = 3
+    MODERATE_SUCCESS = 2
+    PYRRHIC_VICTORY = 1
+    UTTER_FAILURE = 0
+
+
+class BankRecordSenderTypeEnum(int, Enum):
+    NATION = 1
+    ALLIANCE = 2

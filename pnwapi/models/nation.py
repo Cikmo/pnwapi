@@ -2,12 +2,13 @@ import typing
 from . import model_enums
 
 from tortoise.models import Model
-from tortoise import fields
+from tortoise import fields, expressions
+from tortoise.queryset import QuerySet
 
 if typing.TYPE_CHECKING:
-    from . import CityModel
-    from . import AllianceModel
-    from . import ColorModel
+    from . import (CityModel, AllianceModel, TaxBracketModel,
+                   AlliancePositionModel, ColorModel, WarModel,
+                   BankRecordModel, TaxRecordModel)
 
 
 class NationModel(Model):
@@ -85,14 +86,15 @@ class NationModel(Model):
 
     alliance: fields.ForeignKeyRelation["AllianceModel"] = fields.ForeignKeyField(
         "pnwapi.AllianceModel", related_name="nations", null=True, on_delete=fields.SET_NULL, default=None)
-    # alliance_position: fields.ForeignKeyRelation["AlliancePositionModel"] = fields.ForeignKeyField(
-    #     "pnwdb.AlliancePositionModel", related_name="nations", null=True, on_delete=fields.SET_NULL, default=None)
-    # tax_bracket: fields.ForeignKeyRelation["TaxBracketModel"] = fields.ForeignKeyField(
-    #     "pnwdb.TaxBracketModel", related_name="nations", null=True, on_delete=fields.SET_NULL, default=None)
+    alliance_position: fields.ForeignKeyRelation["AlliancePositionModel"] = fields.ForeignKeyField(
+        "pnwapi.AlliancePositionModel", related_name="nations", null=True, on_delete=fields.SET_NULL, default=None)
+    tax_bracket: fields.ForeignKeyRelation["TaxBracketModel"] = fields.ForeignKeyField(
+        "pnwapi.TaxBracketModel", related_name="nations", null=True, on_delete=fields.SET_NULL, default=None)
+    tax_records: fields.ReverseRelation["TaxRecordModel"]
 
     cities: fields.ReverseRelation["CityModel"]
-    # offensive_wars: fields.ReverseRelation["WarModel"]
-    # defensive_wars: fields.ReverseRelation["WarModel"]
+    offensive_wars: fields.ReverseRelation["WarModel"]
+    defensive_wars: fields.ReverseRelation["WarModel"]
     # bounties: fields.ReverseRelation["Bounty"]
 
     # The following should be fetched direclty from API, instead of saving in db
@@ -101,5 +103,35 @@ class NationModel(Model):
     #   treasures = fields.ManyToManyField("models.Treasure", related_name="nation")
     #   tax_records
 
+    _bank_records_sender: fields.ReverseRelation["BankRecordModel"]
+    _bank_records_receiver: fields.ReverseRelation["BankRecordModel"]
+
+    @property
+    def bank_records(self) -> QuerySet["BankRecordModel"]:
+        """Get all bank records for this nation. This is a property, not a field.
+
+        Returns:
+            All bank records for this nation.
+        """
+        # TODO: check which of these work, and or if there is a better way. Use the one that works the fastest.
+        # self._bank_records_sender.remote_model.filter(
+        #     expressions.Q(sender=self) | expressions.Q(receiver=self))
+        return self._bank_records_sender.all() + self._bank_records_receiver.all()
+
+    @property
+    def wars(self) -> QuerySet["WarModel"]:
+        """Get all wars this nation is involved in. This is a property, not a field.
+
+        Returns:
+            All wars this nation is involved in.
+        """
+        return self.offensive_wars.all() + self.defensive_wars.all()
+
     def __str__(self):
         return self.name
+
+# async def dada():
+#     nation = NationModel()
+
+#     async for bankrecs in nation.bank_records.order_by("date"):
+#         print(bankrecs)

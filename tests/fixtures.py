@@ -19,27 +19,12 @@ def logger():
 
 @pytest.fixture(scope="session", autouse=True)
 def initialize_tests(request: pytest.FixtureRequest):
+    log.debug("Initializing test Tortoise-ORM database.")
     db_url = os.environ.get("DB_URL", "sqlite://:memory:")
-
-    failed = False
-    while True:
-        try:
-            log.debug("Initializing test Tortoise-ORM.")
-            initializer(["tests.testmodels"],
-                        db_url=db_url, app_label="pnwapi")
-            request.addfinalizer(finalizer)
-        except:
-            if failed is False and db_url != "sqlite://:memory:":
-                log.warning(
-                    "Failed to initialize Tortoise-ORM using the DB_URL environment variable. Falling back to sqlite://:memory:.")
-                failed = True
-                db_url = "sqlite://:memory:"
-                continue
-            else:
-                log.error(
-                    f"Failed to initialize Tortoise-ORM using {db_url}.")
-                raise
-        break
+    initializer(["tests.testmodels"],
+                db_url=db_url, app_label="pnwapi")
+    request.addfinalizer(finalizer)
+    log.debug("Test Tortoise-ORM database initialized.")
 
 
 @pytest.fixture(scope='session')
