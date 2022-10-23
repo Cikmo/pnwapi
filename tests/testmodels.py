@@ -1,3 +1,1 @@
-from pnwapi.models import (
-    NationModel
-)
+from pnwapi.models import *

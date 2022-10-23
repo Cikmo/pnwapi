@@ -5,7 +5,9 @@ from tortoise.models import Model
 from tortoise import fields
 
 if typing.TYPE_CHECKING:
-    ...
+    from . import CityModel
+    from . import AllianceModel
+    from . import ColorModel
 
 
 class NationModel(Model):
@@ -18,7 +20,8 @@ class NationModel(Model):
     continent = fields.CharEnumField(model_enums.ContinentEnum)
     war_policy = fields.CharEnumField(model_enums.WarPolicyEnum)
     domestic_policy = fields.CharEnumField(model_enums.DomesticPolicyEnum)
-    color = fields.CharEnumField(model_enums.ColorEnum)
+    color: fields.ForeignKeyRelation["ColorModel"] = fields.ForeignKeyField(
+        "pnwapi.ColorModel", related_name="nations")
     num_cities = fields.IntField()  # Is this needed?
     score = fields.FloatField()
     update_timezone = fields.IntField(default=0)
@@ -78,18 +81,19 @@ class NationModel(Model):
     spy_kills = fields.IntField()
     spy_attacks = fields.IntField()
     money_looted = fields.FloatField()
+    vip = fields.BooleanField()
 
-    # alliance: fields.ForeignKeyRelation["AllianceModel"] = fields.ForeignKeyField(
-    #     "pnwdb.AllianceModel", related_name="nations", null=True, on_delete=fields.SET_NULL, default=None)
+    alliance: fields.ForeignKeyRelation["AllianceModel"] = fields.ForeignKeyField(
+        "pnwapi.AllianceModel", related_name="nations", null=True, on_delete=fields.SET_NULL, default=None)
     # alliance_position: fields.ForeignKeyRelation["AlliancePositionModel"] = fields.ForeignKeyField(
     #     "pnwdb.AlliancePositionModel", related_name="nations", null=True, on_delete=fields.SET_NULL, default=None)
     # tax_bracket: fields.ForeignKeyRelation["TaxBracketModel"] = fields.ForeignKeyField(
     #     "pnwdb.TaxBracketModel", related_name="nations", null=True, on_delete=fields.SET_NULL, default=None)
 
-    # cities: fields.ReverseRelation["CityModel"]
+    cities: fields.ReverseRelation["CityModel"]
     # offensive_wars: fields.ReverseRelation["WarModel"]
     # defensive_wars: fields.ReverseRelation["WarModel"]
-    #bounties: fields.ReverseRelation["Bounty"]
+    # bounties: fields.ReverseRelation["Bounty"]
 
     # The following should be fetched direclty from API, instead of saving in db
     #   bank_records = fields.ManyToManyField("models.BankRecord")

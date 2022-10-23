@@ -14,7 +14,7 @@ async def test_testing(caplog: pytest.LogCaptureFixture, logger: logging.Logger)
 
     await Pnwapi.init(db_url, api_key)
 
-    result = await Pnwapi.get.nations("test")
+    result = await Pnwapi.get.nations(name="norlandia")
 
     logger.info(result[0].nation_name)
 

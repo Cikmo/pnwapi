@@ -18,9 +18,7 @@ logger = logging.getLogger(__name__)
 class Get:
     @classmethod
     async def nations(self, name: str):
-        query = await Pnwapi.api.query("nations", {"id": 239259, "first": 1}, "nation_name")
-
-        # result = await query.get_async()
+        query = await Pnwapi.api.query("nations", {"nation_name": name, "first": 1}, "nation_name")
 
         return query.nations
 
@@ -84,7 +82,7 @@ class Pnwapi:
     async def _db_init(cls, db_url: str) -> None:
         # Only initialize the DB if we're not in a test environment.
         # Tests use a seperate initializer found in the `tests/fixtures.py` file.
-        if not "pytest" in sys.modules:
+        if not "PYTEST_CURRENT_TEST" in os.environ:
             logger.warning(
                 "If this is a test, you shouldn't see this message. You can safely ignore this warning if this is not a test. This warning is located in pnwapi.py in the Pnwapi.init() function.")
             tortoise_config = {

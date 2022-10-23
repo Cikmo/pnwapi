@@ -56,3 +56,14 @@ class WarTypeEnum(str, Enum):
     ORDINARY = "ORDINARY"
     ATTRITION = "ATTRITION"
     RAID = "RAID"
+
+
+class TreatyTypeEnum(str, Enum):
+    NPT = "NPT"
+    PROTECTORATE = "Protectorate"
+    NAP = "NAP"
+    PIAT = "PIAT"
+    ODP = "ODP"
+    ODoAP = "ODoAP"
+    MDP = "MDP"
+    MDoAP = "MDoAP"
