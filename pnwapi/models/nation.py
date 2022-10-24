@@ -45,6 +45,19 @@ class NationModel(Model):
     turns_since_last_city = fields.IntField()
     turns_since_last_project = fields.IntField()
     project_bits = fields.IntField()
+    vip = fields.BooleanField()
+    treasures: fields.ReverseRelation["TreasureModel"]
+    bounties: fields.ReverseRelation["BountyModel"]
+    cities: fields.ReverseRelation["CityModel"]
+    offensive_wars: fields.ReverseRelation["WarModel"]
+    defensive_wars: fields.ReverseRelation["WarModel"]
+    alliance: fields.ForeignKeyRelation["AllianceModel"] = fields.ForeignKeyField(
+        "pnwapi.AllianceModel", related_name="nations", null=True, on_delete=fields.SET_NULL, default=None)
+    alliance_position: fields.ForeignKeyRelation["AlliancePositionModel"] = fields.ForeignKeyField(
+        "pnwapi.AlliancePositionModel", related_name="nations", null=True, on_delete=fields.SET_NULL, default=None)
+    tax_bracket: fields.ForeignKeyRelation["TaxBracketModel"] = fields.ForeignKeyField(
+        "pnwapi.TaxBracketModel", related_name="nations", null=True, on_delete=fields.SET_NULL, default=None)
+    tax_records: fields.ReverseRelation["TaxRecordModel"]
 
     # Military
     soldiers = fields.IntField()
@@ -91,21 +104,6 @@ class NationModel(Model):
     spy_kills = fields.IntField()
     spy_attacks = fields.IntField()
     money_looted = fields.FloatField()
-    vip = fields.BooleanField()
-    treasures: fields.ReverseRelation["TreasureModel"]
-    bounties: fields.ReverseRelation["BountyModel"]
-
-    alliance: fields.ForeignKeyRelation["AllianceModel"] = fields.ForeignKeyField(
-        "pnwapi.AllianceModel", related_name="nations", null=True, on_delete=fields.SET_NULL, default=None)
-    alliance_position: fields.ForeignKeyRelation["AlliancePositionModel"] = fields.ForeignKeyField(
-        "pnwapi.AlliancePositionModel", related_name="nations", null=True, on_delete=fields.SET_NULL, default=None)
-    tax_bracket: fields.ForeignKeyRelation["TaxBracketModel"] = fields.ForeignKeyField(
-        "pnwapi.TaxBracketModel", related_name="nations", null=True, on_delete=fields.SET_NULL, default=None)
-    tax_records: fields.ReverseRelation["TaxRecordModel"]
-
-    cities: fields.ReverseRelation["CityModel"]
-    offensive_wars: fields.ReverseRelation["WarModel"]
-    defensive_wars: fields.ReverseRelation["WarModel"]
 
     _bank_records_sender: fields.ReverseRelation["BankRecordModel"]
     _bank_records_receiver: fields.ReverseRelation["BankRecordModel"]
