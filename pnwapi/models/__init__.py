@@ -5,4 +5,4 @@ from .color import ColorModel
 from .treaty import TreatyModel
 from .war import WarModel, WarAttackModel
 from .bank_records import BankRecordModel, TaxRecordModel
-from treasure import TreasureModel
+from .treasure import TreasureModel

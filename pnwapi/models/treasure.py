@@ -9,14 +9,14 @@ if typing.TYPE_CHECKING:
 
 
 class TreasureModel(Model):
-    name = fields.TextField(pk=True)
+    name = fields.CharField(pk=True, max_length=50)
     color: fields.ForeignKeyRelation["ColorModel"] = fields.ForeignKeyField(
         "pnwapi.ColorModel", related_name=None)
     continent = fields.CharEnumField(model_enums.ContinentEnum)
     bonus = fields.IntField()
     spawn_date = fields.DatetimeField()
-    nation: fields.OneToOneRelation["NationModel"] = fields.OneToOneField(
-        "pnwapi.NationModel", related_name="treasure", on_delete=fields.SET_NULL)
+    nation: fields.ForeignKeyRelation["NationModel"] = fields.ForeignKeyField(
+        "pnwapi.NationModel", related_name="treasures", on_delete=fields.SET_NULL, null=True)
 
     def __str__(self):
-        return self.id
+        return self.name
