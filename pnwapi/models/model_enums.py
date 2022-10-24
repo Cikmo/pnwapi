@@ -97,3 +97,10 @@ class WarAttackOutcomeEnum(int, Enum):
 class BankRecordSenderTypeEnum(int, Enum):
     NATION = 1
     ALLIANCE = 2
+
+
+class BountyTypeEnum(str, Enum):
+    ORDINARY = "ORDINARY"
+    ATTRITION = "ATTRITION"
+    RAID = "RAID"
+    NUCLEAR = "NUCLEAR"

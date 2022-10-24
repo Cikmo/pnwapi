@@ -15,7 +15,8 @@ if typing.TYPE_CHECKING:
         WarModel,
         BankRecordModel,
         TaxRecordModel,
-        TreasureModel
+        TreasureModel,
+        BountyModel
     )
 
 
@@ -92,6 +93,7 @@ class NationModel(Model):
     money_looted = fields.FloatField()
     vip = fields.BooleanField()
     treasures: fields.ReverseRelation["TreasureModel"]
+    bounties: fields.ReverseRelation["BountyModel"]
 
     alliance: fields.ForeignKeyRelation["AllianceModel"] = fields.ForeignKeyField(
         "pnwapi.AllianceModel", related_name="nations", null=True, on_delete=fields.SET_NULL, default=None)
