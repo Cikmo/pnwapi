@@ -5,7 +5,7 @@ from tortoise import fields
 from . import model_enums
 
 if typing.TYPE_CHECKING:
-    from . import NationModel, AllianceModel
+    from . import NationModel, AllianceModel, TreasureModel
 
 
 class ColorModel(Model):

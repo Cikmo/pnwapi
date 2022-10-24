@@ -6,9 +6,17 @@ from tortoise import fields, expressions
 from tortoise.queryset import QuerySet
 
 if typing.TYPE_CHECKING:
-    from . import (CityModel, AllianceModel, TaxBracketModel,
-                   AlliancePositionModel, ColorModel, WarModel,
-                   BankRecordModel, TaxRecordModel)
+    from . import (
+        CityModel,
+        AllianceModel,
+        TaxBracketModel,
+        AlliancePositionModel,
+        ColorModel,
+        WarModel,
+        BankRecordModel,
+        TaxRecordModel,
+        TreasureModel
+    )
 
 
 class NationModel(Model):
@@ -27,7 +35,7 @@ class NationModel(Model):
     score = fields.FloatField()
     update_timezone = fields.IntField(default=0)
     population = fields.IntField()
-    flag_url = fields.TextField()
+    flag = fields.TextField()
     last_active = fields.DatetimeField()
     date_created = fields.DatetimeField()
     vacation_mode_turns = fields.IntField()
@@ -83,6 +91,7 @@ class NationModel(Model):
     spy_attacks = fields.IntField()
     money_looted = fields.FloatField()
     vip = fields.BooleanField()
+    treasures: fields.ReverseRelation["TreasureModel"]
 
     alliance: fields.ForeignKeyRelation["AllianceModel"] = fields.ForeignKeyField(
         "pnwapi.AllianceModel", related_name="nations", null=True, on_delete=fields.SET_NULL, default=None)
@@ -95,13 +104,6 @@ class NationModel(Model):
     cities: fields.ReverseRelation["CityModel"]
     offensive_wars: fields.ReverseRelation["WarModel"]
     defensive_wars: fields.ReverseRelation["WarModel"]
-    # bounties: fields.ReverseRelation["Bounty"]
-
-    # The following should be fetched direclty from API, instead of saving in db
-    #   bank_records = fields.ManyToManyField("models.BankRecord")
-    #   trades = fields.ManyToManyField("models.Trade", related_name="nations")
-    #   treasures = fields.ManyToManyField("models.Treasure", related_name="nation")
-    #   tax_records
 
     _bank_records_sender: fields.ReverseRelation["BankRecordModel"]
     _bank_records_receiver: fields.ReverseRelation["BankRecordModel"]
