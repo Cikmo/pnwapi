@@ -13,8 +13,8 @@ class ColorModel(Model):
     bloc_name = fields.TextField()
     turn_bonus = fields.IntField()
 
-    nations = fields.ReverseRelation["NationModel"]
-    alliances = fields.ReverseRelation["AllianceModel"]
+    nations: fields.ReverseRelation["NationModel"]
+    alliances: fields.ReverseRelation["AllianceModel"]
 
     def __str__(self):
         return self.color
