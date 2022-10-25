@@ -50,7 +50,7 @@ class Pnwapi(metaclass=PnwapiMeta):
 
         await cls._db_init(db_url)
 
-        cls._api = pnwkit.QueryKit(pnw_api_key, pnw_bot_key).query("nation")
+        cls._api = pnwkit.QueryKit(pnw_api_key, pnw_bot_key)
 
         # test the API key
         query = cls._api.query(
