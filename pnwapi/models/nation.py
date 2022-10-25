@@ -131,9 +131,3 @@ class NationModel(Model):
 
     def __str__(self):
         return self.name
-
-# async def dada():
-#     nation = NationModel()
-
-#     async for bankrecs in nation.bank_records.order_by("date"):
-#         print(bankrecs)

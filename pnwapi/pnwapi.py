@@ -8,38 +8,26 @@ import tortoise.exceptions
 import pytest
 
 from . import exceptions
-
 from tortoise import Tortoise
-from dataclasses import dataclass
+from .actions import Fetch
 
 logger = logging.getLogger(__name__)
 
 
-class Get:
-    @classmethod
-    async def nations(self, name: str):
-        query = await Pnwapi.api.query("nations", {"nation_name": name, "first": 1}, "nation_name")
-
-        return query.nations
+class PnwapiMeta(type):
+    def __call__(self):
+        raise RuntimeError(
+            f"{self.__name__} is not meant to be instantiated.")
 
 
-class Pnwapi:
+class Pnwapi(metaclass=PnwapiMeta):
     """
     The Pnwapi class is the main interface for pnwapi. It is a singleton class, and as such, cannot be instantiated.
 
     Use :meth:`Pnwapi.init` to initialize the class.
     """
     _inited: bool = False
-
-    api: pnwkit.QueryKit
-
-    get: Get = Get
-
-    def __init__(self):
-        # Note: This class cannot be instantiated, as it is a singleton. All methods are classmethods.
-        # If a class instance is attempted to be created, raise an error.
-        raise RuntimeError(
-            "Pnwapi cannot be instantiated as an instance. Use Pnwapi.init() instead.")
+    _api: pnwkit.QueryKit
 
     @classmethod
     async def init(cls, db_url: str,
@@ -62,10 +50,10 @@ class Pnwapi:
 
         await cls._db_init(db_url)
 
-        cls.api = pnwkit.QueryKit(pnw_api_key, pnw_bot_key)
+        cls._api = pnwkit.QueryKit(pnw_api_key, pnw_bot_key).query("nation")
 
         # test the API key
-        query = cls.api.query(
+        query = cls._api.query(
             "nations", {"id": 239259, "first": 1}, "nation_name")
         try:
             await query.get_async()
