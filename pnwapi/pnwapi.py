@@ -9,7 +9,6 @@ import pytest
 
 from . import exceptions
 from tortoise import Tortoise
-from .actions import Fetch
 
 logger = logging.getLogger(__name__)
 
