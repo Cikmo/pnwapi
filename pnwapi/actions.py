@@ -3,7 +3,7 @@ import typing
 import pnwkit
 
 from tortoise.expressions import Q
-from .objects import Nation, PnwObjectList
+from .objects import PnwObject, PnwObjectList, Nation
 
 
 class ActionMeta(type):
@@ -24,79 +24,79 @@ class Action(metaclass=ActionMeta):
     """Base class for all actions."""
 
     @classmethod
-    async def nations(cls):
+    async def nations(cls) -> PnwObjectList[PnwObject]:
         pass
 
     @classmethod
-    async def alliances(cls):
+    async def alliances(cls) -> PnwObjectList[PnwObject]:
         pass
 
     @classmethod
-    async def cities(cls):
+    async def cities(cls) -> PnwObjectList[PnwObject]:
         pass
 
     @classmethod
-    async def colors(cls):
+    async def colors(cls) -> PnwObjectList[PnwObject]:
         pass
 
     @classmethod
-    async def wars(cls):
+    async def wars(cls) -> PnwObjectList[PnwObject]:
         pass
 
     @classmethod
-    async def war_attacks(cls):
+    async def war_attacks(cls) -> PnwObjectList[PnwObject]:
         pass
 
     @classmethod
-    async def treaties(cls):
+    async def treaties(cls) -> PnwObjectList[PnwObject]:
         pass
 
     @classmethod
-    async def trades(cls):
+    async def trades(cls) -> PnwObjectList[PnwObject]:
         pass
 
     @classmethod
-    async def trade_prices(cls):
+    async def trade_prices(cls) -> PnwObjectList[PnwObject]:
         pass
 
     @classmethod
-    async def bank_records(cls):
+    async def bank_records(cls) -> PnwObjectList[PnwObject]:
         pass
 
     @classmethod
-    async def tax_records(cls):
+    async def tax_records(cls) -> PnwObjectList[PnwObject]:
         pass
 
     @classmethod
-    async def tax_brackets(cls):
+    async def tax_brackets(cls) -> PnwObjectList[PnwObject]:
         pass
 
     @classmethod
-    async def bounties(cls):
+    async def bounties(cls) -> PnwObjectList[PnwObject]:
         pass
 
     @classmethod
-    async def treasures(cls):
+    async def treasures(cls) -> PnwObjectList[PnwObject]:
         pass
 
     @classmethod
-    async def treasure_trades(cls):
+    async def treasure_trades(cls) -> PnwObjectList[PnwObject]:
         pass
 
     @classmethod
-    async def embargoes(cls):
+    async def embargoes(cls) -> PnwObjectList[PnwObject]:
         pass
 
     @classmethod
-    async def baseball_games(cls):
+    async def baseball_games(cls) -> PnwObjectList[PnwObject]:
         pass
 
     @classmethod
-    async def baseball_teams(cls):
+    async def baseball_teams(cls) -> PnwObjectList[PnwObject]:
         pass
 
     @classmethod
-    async def baseball_players(cls):
+    async def baseball_players(cls) -> PnwObjectList[PnwObject]:
         pass
 
 

@@ -2,6 +2,7 @@ import typing
 
 from tortoise.models import Model
 from tortoise import fields
+from tortoise.functions import Count
 
 if typing.TYPE_CHECKING:
     from . import NationModel
