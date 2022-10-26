@@ -67,9 +67,20 @@ class Pnwapi(metaclass=PnwapiMeta):
 
     @classmethod
     async def _db_init(cls, db_url: str) -> None:
-        # Only initialize the DB if we're not in a test environment.
-        # Tests use a seperate initializer found in the `tests/fixtures.py` file.
+        """Internal method to initialize Tortoise ORM. Creates a connection pool to the database, 
+        and creates the database tables if they don't exist.
+
+        Args:
+            db_url: The connection string for the database.
+
+        Raises:
+            exceptions.InvalidDatabaseUrl: Raised when an invalid database URL is provided.
+            exceptions.DatabaseConnectionError: Raised when a database connection error occurs.
+        """
+        # TODO: add support for injection / manual initialization of Tortoise, so that users can use their own Tortoise databases.
+
         if not "PYTEST_CURRENT_TEST" in os.environ:
+            # Tests use a seperate initializer found in the `tests/fixtures.py` file.
             logger.warning(
                 "If this is a test, you shouldn't see this message. You can safely ignore this warning if this is not a test. This warning is located in pnwapi.py in the Pnwapi.init() function.")
             tortoise_config = {
