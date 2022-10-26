@@ -4,10 +4,7 @@ from pnwapi.query import PnwQuerySet
 
 class PnwObject:
     """Base class for all PnwObjects."""
-
-    def __init__(self, **kwargs):
-        for key, value in kwargs.items():
-            setattr(self, key, value)
+    __slots__ = ()
 
 
 class Nation(PnwObject):
@@ -20,7 +17,7 @@ class Nation(PnwObject):
 
 
 class Alliance(PnwObject):
-    __slots__ = ("id", "name")
+    __slots__ = ("id", "name", "members")
 
     def __init__(self):
         self.id: int

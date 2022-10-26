@@ -19,6 +19,8 @@ async def test_testing(caplog: pytest.LogCaptureFixture, logger: logging.Logger)
 
     nation = await pnwapi.nations.get(name="norlandia")
 
+    alliance = await nation.alliance
+
     await pnwapi.Pnwapi._api.aiohttp_session.close()
 
     assert 1 == 1

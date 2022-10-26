@@ -9,13 +9,14 @@ PNWOBJECT = TypeVar("PNWOBJECT", bound="PnwObject")
 
 class PnwQuerySet(Generic[PNWOBJECT]):
     """Base class for PnwQueries"""
+    __slots__ = ("_obj",)
 
     def __init__(self, obj: type[PNWOBJECT]):
-        self.obj = obj
+        self._obj = obj
 
     async def get(self, **kwargs) -> PNWOBJECT:
         """Get the first object matching the given kwargs."""
-        return self.obj()
+        return self._obj()
 
     def filter(self, **kwargs) -> "PnwQuerySet[PNWOBJECT]":
         """Return a new PnwQuerySet filtered by the given kwargs."""
@@ -23,7 +24,7 @@ class PnwQuerySet(Generic[PNWOBJECT]):
 
     def first(self) -> "PnwQuerySetSingle[PNWOBJECT]":
         """Get the first object in the queryset."""
-        queryset = PnwQuerySetSingle(self.obj)
+        queryset = PnwQuerySetSingle(self._obj)
         return queryset
 
     def sort_by(self, key: str, reverse: bool = False) -> "PnwQuerySet[PNWOBJECT]":
@@ -42,18 +43,19 @@ class PnwQuerySet(Generic[PNWOBJECT]):
         return self.filter(**kwargs)
 
     async def __anext__(self) -> PNWOBJECT:
-        yield self.obj()
+        yield self._obj()
 
     async def _execute(self) -> list[PNWOBJECT]:
         """Execute the query and return the results."""
-        return [self.obj()]
+        return [self._obj()]
 
 
 class PnwQuerySetSingle(Generic[PNWOBJECT]):
     """QuerySet for single objects."""
+    __slots__ = ("_obj",)
 
     def __init__(self, obj: type[PNWOBJECT]):
-        self.obj = obj
+        self._obj = obj
 
     def __call__(self, **kwargs) -> "PnwQuerySetSingle[PNWOBJECT]":
         return self
@@ -64,4 +66,4 @@ class PnwQuerySetSingle(Generic[PNWOBJECT]):
 
     async def _execute(self) -> PNWOBJECT:
         """Execute the query and return the results."""
-        return self.obj()
+        return self._obj()
