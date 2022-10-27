@@ -1,6 +1,3 @@
-from .pnwobject import PnwObject, PnwObjectList
-from .nation import Nation
+from .pnwobject import PnwObject, PNWOBJECT
 from .alliance import Alliance
-
-nation = nation
-alliance = nation
+from .nation import Nation

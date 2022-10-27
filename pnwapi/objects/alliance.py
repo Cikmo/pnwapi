@@ -1,10 +1,12 @@
-from .pnwobject import PnwObject
-from . import nation
+from typing import TypeVar, Generic
+from pnwapi import query
+from . import pnwobject, nation
 
 
-class Alliance(PnwObject):
-    __slots__ = ("id", "name")
+class Alliance(pnwobject.PnwObject):
+    __slots__ = ("id", "name", "members")
 
     def __init__(self):
         self.id: int
         self.name: str
+        self.members = query.PnwQuerySet(nation.Nation).filter()
