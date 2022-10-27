@@ -7,10 +7,51 @@ import pnwkit.errors
 import tortoise.exceptions
 import pytest
 
-from . import exceptions
 from tortoise import Tortoise
+from typing import Generic
+
+from . import exceptions
+from . import query
+from . import objects
 
 logger = logging.getLogger(__name__)
+
+
+class Interface(Generic[objects.PNWOBJECT]):
+    """The main entry interface for interacting with the library."""
+    __slots__ = ("_obj", "_base_query", "filter", "get")
+
+    def __init__(self, obj: type[objects.PNWOBJECT]):
+        self._obj = obj
+        self._base_query = query.PnwQuerySet(obj)
+        self.filter = self._base_query.filter
+        self.get = self._base_query.get
+
+    @classmethod
+    async def sync(self, return_updated: bool = False, **kwargs) -> list[objects.Alliance] | None:
+        """Update the local database with the data from the API.
+
+        args:
+            return_updated: Whether to return the updated objects.
+            **kwargs: The kwargs to filter the query by.
+
+        Returns:
+            Optionally returns a list of the updated objects.
+        """
+        pass
+
+    @classmethod
+    async def subscribe(self, **kwargs) -> None:
+        """Subscribe to the API for updates on the given objects. This will watch for changes to the objects and update the local database,
+        create new objects and remove deleted ones all automatically.
+
+        This is a non-blocking function. It will return immediately and run in the background. To stop the subscription,
+        call the `unsubscribe` method.
+        """
+        # return an awaitable class. The class will also have a method to unsubscribe.
+        # syntax: await pnwapi.alliances.subscribe()
+        # set to an object that can be used to unsubscribe.
+        pass
 
 
 class PnwapiMeta(type):
