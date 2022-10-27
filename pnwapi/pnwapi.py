@@ -28,7 +28,7 @@ class Interface(Generic[objects.PNWOBJECT]):
         self.get = self._base_query.get
 
     @classmethod
-    async def sync(self, return_updated: bool = False, **kwargs) -> list[objects.Alliance] | None:
+    async def sync(self, return_updated: bool = False, **kwargs) -> list[objects.PNWOBJECT] | None:
         """Update the local database with the data from the API.
 
         args:
