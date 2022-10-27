@@ -162,3 +162,9 @@ cython_debug/
 
 # vscode
 .vscode/
+
+
+# Sqlite
+*.db
+*.db-shm
+*.db-wal
