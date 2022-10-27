@@ -4,7 +4,8 @@ from . import pnwobject, alliance
 
 
 class Nation(pnwobject.PnwObject):
-    __slots__ = ("id", "name", "alliance")
+    #__slots__ = ("id", "name", "alliance")
+    _api_name: str = "nation"
 
     def __init__(self):
         self.id: int

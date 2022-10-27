@@ -17,17 +17,31 @@ from . import objects
 logger = logging.getLogger(__name__)
 
 
+def _enforce_init(func):
+    """Decorator that enforces that the class has been initialized before calling the function.
+
+    Raises:
+        NotInitializedError: If the class has not been initialized.
+    """
+    def wrapper(*args, **kwargs):
+        if not Pnwapi._inited:
+            raise exceptions.NotInitializedError(
+                "Pnwapi has not been initialized. Please call Pnwapi.init() before using the library.")
+        return func(*args, **kwargs)
+    return wrapper
+
+
 class Interface(Generic[objects.PNWOBJECT]):
     """The main entry interface for interacting with the library."""
     __slots__ = ("_obj", "_base_query", "filter", "get")
 
     def __init__(self, obj: type[objects.PNWOBJECT]):
         self._obj = obj
+        logger.info(type(self._obj))
         self._base_query = query.PnwQuerySet(obj)
         self.filter = self._base_query.filter
         self.get = self._base_query.get
 
-    @classmethod
     async def sync(self, return_updated: bool = False, **kwargs) -> list[objects.PNWOBJECT] | None:
         """Update the local database with the data from the API.
 
@@ -40,8 +54,8 @@ class Interface(Generic[objects.PNWOBJECT]):
         """
         pass
 
-    @classmethod
-    async def subscribe(self, **kwargs) -> None:
+    @_enforce_init
+    async def subscribe(self) -> None:
         """Subscribe to the API for updates on the given objects. This will watch for changes to the objects and update the local database,
         create new objects and remove deleted ones all automatically.
 
@@ -51,6 +65,21 @@ class Interface(Generic[objects.PNWOBJECT]):
         # return an awaitable class. The class will also have a method to unsubscribe.
         # syntax: await pnwapi.alliances.subscribe()
         # set to an object that can be used to unsubscribe.
+        logger.info(self._obj._api_name)
+        subscription = await Pnwapi._api.subscribe(self._obj._api_name, "update")
+        async for nation in subscription:
+            logger.info(nation.nation_name)
+
+    async def raw_request(self, endpoint: str, **kwargs) -> dict:
+        """Make a raw request to the API.
+
+        args:
+            endpoint: The endpoint to make the request to.
+            **kwargs: The kwargs to pass to the request.
+
+        Returns:
+            The response from the API.
+        """
         pass
 
 
@@ -157,17 +186,3 @@ class Pnwapi(metaclass=PnwapiMeta):
         else:
             logger.warning(
                 "If this is not a test, you shouldn't see this message. Skipping DB initialization.")
-
-    @staticmethod
-    def _enforce_init(func):
-        """Decorator that enforces that the class has been initialized before calling the function.
-
-        Raises:
-            NotInitializedError: If the class has not been initialized.
-        """
-        def wrapper(*args, **kwargs):
-            if not Pnwapi._inited:
-                raise exceptions.NotInitializedError(
-                    "Pnwapi has not been initialized. Please call Pnwapi.init() before using the library.")
-            return func(*args, **kwargs)
-        return wrapper

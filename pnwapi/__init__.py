@@ -9,6 +9,8 @@ __all__ = ("init", "nations", "alliances", "close_connections")
 
 init = __pnwapi.Pnwapi.init
 
+print(__objects.Nation._api_name)
+
 nations = __pnwapi.Interface(__objects.Nation)
 alliances = __pnwapi.Interface(__objects.Alliance)
 

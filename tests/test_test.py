@@ -17,7 +17,9 @@ async def test_testing(caplog: pytest.LogCaptureFixture, logger: logging.Logger)
     await pnwapi.init(db_url, api_key)
     await pnwapi.alliances.sync(id=12345)
     await pnwapi.nations.sync(id=12345)
-    await pnwapi.alliances.subscribe()
+    # await pnwapi.alliances.subscribe()
     await pnwapi.nations.filter(name="The United States of America").first()
+
+    # await pnwapi.nations.subscribe()
     await pnwapi.close_connections()
     assert 1 == 1
