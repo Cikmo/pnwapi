@@ -1,38 +1,48 @@
-import asyncio
 import os
-import pnwkit
-import sys
 import logging
+import pnwkit
 import pnwkit.errors
 import tortoise.exceptions
-import pytest
 
 from tortoise import Tortoise
-from typing import Generic
+from typing import Generic, Any, Callable, TYPE_CHECKING
 
 from . import exceptions
 from . import query
+
 from . import objects
 
+if TYPE_CHECKING:
+    import pnwkit.new
+    import pnwkit.data
 logger = logging.getLogger(__name__)
 
 
-def _enforce_init(func):
-    """Decorator that enforces that the class has been initialized before calling the function.
+def _raise_if_not_inited(func: Callable[..., Any]) -> Callable[..., Any]:
+    """Decorator that checks if Pnwapi has been initialized before calling the function.
 
     Raises:
-        NotInitializedError: If the class has not been initialized.
+        NotInitializedError: If Pnwapi has not been initialized.
     """
-    def wrapper(*args, **kwargs):
+
+    def wrapper(*args: Any, **kwargs: Any):
         if not Pnwapi._inited:
             raise exceptions.NotInitializedError(
-                "Pnwapi has not been initialized. Please call Pnwapi.init() before using the library.")
+                "Pnwapi has not been initialized. Please call Pnwapi.init() before using the library."
+            )
         return func(*args, **kwargs)
+
     return wrapper
+
+
+async def callback(nation: "pnwkit.data.Nation"):
+    # Testing callback
+    logger.info(nation.nation_name)
 
 
 class Interface(Generic[objects.PNWOBJECT]):
     """The main entry interface for interacting with the library."""
+
     __slots__ = ("_obj", "_base_query", "filter", "get")
 
     def __init__(self, obj: type[objects.PNWOBJECT]):
@@ -42,7 +52,10 @@ class Interface(Generic[objects.PNWOBJECT]):
         self.filter = self._base_query.filter
         self.get = self._base_query.get
 
-    async def sync(self, return_updated: bool = False, **kwargs) -> list[objects.PNWOBJECT] | None:
+    @_raise_if_not_inited
+    async def sync(
+        self, return_updated: bool = False, **kwargs: str
+    ) -> list[objects.PNWOBJECT] | None:
         """Update the local database with the data from the API.
 
         args:
@@ -54,7 +67,7 @@ class Interface(Generic[objects.PNWOBJECT]):
         """
         pass
 
-    @_enforce_init
+    @_raise_if_not_inited
     async def subscribe(self) -> None:
         """Subscribe to the API for updates on the given objects. This will watch for changes to the objects and update the local database,
         create new objects and remove deleted ones all automatically.
@@ -62,15 +75,12 @@ class Interface(Generic[objects.PNWOBJECT]):
         This is a non-blocking function. It will return immediately and run in the background. To stop the subscription,
         call the `unsubscribe` method.
         """
-        # return an awaitable class. The class will also have a method to unsubscribe.
-        # syntax: await pnwapi.alliances.subscribe()
-        # set to an object that can be used to unsubscribe.
-        logger.info(self._obj._api_name)
-        subscription = await Pnwapi._api.subscribe(self._obj._api_name, "update")
-        async for nation in subscription:
-            logger.info(nation.nation_name)
+        await Pnwapi.api.subscribe(
+            self._obj._api_name, "update", None, callback
+        )  # pyright: reportPrivateUsage=false
 
-    async def raw_request(self, endpoint: str, **kwargs) -> dict:
+    @_raise_if_not_inited
+    async def raw_request(self, endpoint: str, **kwargs: str) -> dict[str, Any]:
         """Make a raw request to the API.
 
         args:
@@ -80,13 +90,12 @@ class Interface(Generic[objects.PNWOBJECT]):
         Returns:
             The response from the API.
         """
-        pass
+        ...
 
 
 class PnwapiMeta(type):
-    def __call__(self):
-        raise RuntimeError(
-            f"{self.__name__} is not meant to be instantiated.")
+    def __call__(self, *args: Any, **kwargs: Any):
+        raise RuntimeError(f"{self.__name__} is not meant to be instantiated.")
 
 
 class Pnwapi(metaclass=PnwapiMeta):
@@ -95,13 +104,14 @@ class Pnwapi(metaclass=PnwapiMeta):
 
     Use :meth:`Pnwapi.init` to initialize the class.
     """
+
     _inited: bool = False
-    _api: pnwkit.QueryKit
+    api: pnwkit.QueryKit
 
     @classmethod
-    async def init(cls, db_url: str,
-                   pnw_api_key: str,
-                   pnw_bot_key: str = None) -> None:
+    async def init(
+        cls, db_url: str, pnw_api_key: str, pnw_bot_key: str | None = None
+    ) -> None:
         """
         Initialize pnwapi.
 
@@ -115,21 +125,22 @@ class Pnwapi(metaclass=PnwapiMeta):
         """
         if cls._inited:
             raise exceptions.AlreadyInitializedError(
-                "Pnwapi has already been initialized.")
+                "Pnwapi has already been initialized."
+            )
 
         await cls._db_init(db_url)
 
-        cls._api = pnwkit.QueryKit(pnw_api_key, pnw_bot_key)
+        cls.api = pnwkit.QueryKit(pnw_api_key, pnw_bot_key)
 
         # test the API key
-        query = cls._api.query(
-            "nations", {"id": 239259, "first": 1}, "nation_name")
+        query = cls.api.query("nations", {"id": 239259, "first": 1}, "nation_name")
         try:
             await query.get_async()
         except pnwkit.errors.GraphQLError as e:
             if str(e).startswith("You specified an invalid api_key."):
                 raise exceptions.InvalidApiKeyError(
-                    "The provided API key is invalid. Please check your API key and try again.")
+                    "The provided API key is invalid. Please check your API key and try again."
+                )
             else:
                 raise
 
@@ -137,7 +148,7 @@ class Pnwapi(metaclass=PnwapiMeta):
 
     @classmethod
     async def _db_init(cls, db_url: str) -> None:
-        """Internal method to initialize Tortoise ORM. Creates a connection pool to the database, 
+        """Internal method to initialize Tortoise ORM. Creates a connection pool to the database,
         and creates the database tables if they don't exist.
 
         Args:
@@ -152,37 +163,39 @@ class Pnwapi(metaclass=PnwapiMeta):
         if not "PYTEST_CURRENT_TEST" in os.environ:
             # Tests use a seperate initializer found in the `tests/fixtures.py` file.
             logger.warning(
-                "If this is a test, you shouldn't see this message. You can safely ignore this warning if this is not a test. This warning is located in pnwapi.py in the Pnwapi.init() function.")
+                "If this is a test, you shouldn't see this message. You can safely ignore this warning if this is not a test. This warning is located in pnwapi.py in the Pnwapi.init() function."
+            )
             tortoise_config = {
-                'connections': {
-                    'default': db_url
-                },
-                'apps': {
-                    'pnwapi': {
-                        'models': ['pnwapi.models'],
-                        'default_connection': 'default',
+                "connections": {"default": db_url},
+                "apps": {
+                    "pnwapi": {
+                        "models": ["pnwapi.models"],
+                        "default_connection": "default",
                     }
                 },
-                'use_tz': False,
-                'timezone': 'UTC'
+                "use_tz": False,
+                "timezone": "UTC",
             }
 
             try:
-                await Tortoise.init(config=tortoise_config)
+                await Tortoise.init(config=tortoise_config)  # type: ignore
                 await Tortoise.generate_schemas()
             except tortoise.exceptions.ConfigurationError as e:
                 if "Unknown DB scheme" in str(e):
                     raise exceptions.InvalidDatabaseUrl(
-                        "The database URL schema provided is invalid.")
+                        "The database URL schema provided is invalid."
+                    )
                 raise
             except OSError as e:
                 if "[Errno 10061]" in str(e):
                     raise exceptions.DatabaseConnectionError(
-                        "Could not connect to the database. Is the database running?")
+                        "Could not connect to the database. Is the database running?"
+                    )
                 raise
             except:
                 raise
 
         else:
             logger.warning(
-                "If this is not a test, you shouldn't see this message. Skipping DB initialization.")
+                "If this is not a test, you shouldn't see this message. Skipping DB initialization."
+            )
