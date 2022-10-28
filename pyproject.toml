@@ -11,7 +11,7 @@ keywords = ["api", "pnw", "politics and war", "pnwkit", "wrapper"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-pnwkit-py = "^2.5.6"
+pnwkit-py = "^2.5.9"
 asyncpg = "^0.26.0"
 tortoise-orm = "^0.19.2"
 numba = "^0.56.3"
