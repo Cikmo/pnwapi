@@ -18,7 +18,7 @@ jobs:
           path: ./pyproject.toml
       - name: split pyproject.toml
         id: split
-        uses: juliangruber/split-string-action@v1
+        uses: jungwinter/split@master
         with:
           string: ${{ steps.pyproject.outputs.content }}
           separator: "version = "
