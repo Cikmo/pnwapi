@@ -16,5 +16,10 @@ jobs:
         uses: juliangruber/read-file-action@v1
         with:
           path: ./pyproject.toml
-      - name: Print pyproject.toml
-        run: echo "${{ steps.pyproject.outputs.content }}"
+      - name: split pyproject.toml
+        id: split
+        uses: juliangruber/split-string-action@v1
+        with:
+          string: ${{ steps.pyproject.outputs.content }}
+          separator: "version = "
+        run: echo ${{ steps.split.outputs.result }}
