@@ -22,4 +22,5 @@ jobs:
         with:
           string: ${{ steps.pyproject.outputs.content }}
           separator: "version = "
-        run: echo ${{ steps.split.outputs.result }}
+      - name: print version
+        run: echo ${{ steps.split.outputs._0 }}
