@@ -25,3 +25,5 @@ async def close_connections():
         await __pnwapi.Pnwapi.api.aiohttp_session.close()
     if __pnwapi.Tortoise._inited:  # pyright: reportPrivateUsage=false
         await __pnwapi.Tortoise.close_connections()
+        del __pnwapi.Pnwapi.api
+        __pnwapi.Pnwapi._inited = False
