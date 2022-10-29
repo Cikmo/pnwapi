@@ -44,10 +44,10 @@ class Interface(Generic[objects.PNWOBJECT]):
     """The main entry interface for interacting with the library."""
 
     __slots__ = ("_obj", "_base_query", "filter", "get")
+    _subscriptions: dict[str, pnwkit.new.Subscription[Any]] = {}
 
     def __init__(self, obj: type[objects.PNWOBJECT]):
         self._obj = obj
-        logger.info(type(self._obj))
         self._base_query = query.PnwQuerySet(obj)
         self.filter = self._base_query.filter
         self.get = self._base_query.get
@@ -75,9 +75,17 @@ class Interface(Generic[objects.PNWOBJECT]):
         This is a non-blocking function. It will return immediately and run in the background. To stop the subscription,
         call the `unsubscribe` method.
         """
-        await Pnwapi.api.subscribe(
+        subscription = await Pnwapi.api.subscribe(
             self._obj._api_name, "update", None, callback
         )  # pyright: reportPrivateUsage=false
+        Interface._subscriptions[self._obj._api_name] = subscription
+
+    @_raise_if_not_inited
+    async def unsubscribe(self) -> None:
+        """Unsubscribe from the API for updates on the given objects."""
+        subscription = Interface._subscriptions.pop(self._obj._api_name, None)
+        if subscription is not None:
+            await subscription.unsubscribe()
 
     @_raise_if_not_inited
     async def raw_request(self, endpoint: str, **kwargs: str) -> dict[str, Any]:
