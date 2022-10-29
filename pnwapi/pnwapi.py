@@ -35,20 +35,16 @@ def _raise_if_not_inited(func: Callable[..., Any]) -> Callable[..., Any]:
     return wrapper
 
 
-async def callback(nation: "pnwkit.data.Nation"):
-    # Testing callback
-    logger.info(nation.nation_name)
-
-
 class Interface(Generic[objects.PNWOBJECT]):
     """The main entry interface for interacting with the library."""
 
-    __slots__ = ("_obj", "_base_query", "filter", "get")
-    _subscriptions: dict[str, pnwkit.new.Subscription[Any]] = {}
+    __slots__ = ("_obj", "_base_query", "_subscription", "filter", "get")
 
     def __init__(self, obj: type[objects.PNWOBJECT]):
         self._obj = obj
         self._base_query = query.PnwQuerySet(obj)
+        self._subscription: pnwkit.Subscription[Any] | None = None
+
         self.filter = self._base_query.filter
         self.get = self._base_query.get
 
@@ -75,17 +71,16 @@ class Interface(Generic[objects.PNWOBJECT]):
         This is a non-blocking function. It will return immediately and run in the background. To stop the subscription,
         call the `unsubscribe` method.
         """
-        subscription = await Pnwapi.api.subscribe(
-            self._obj._api_name, "update", None, callback
+        self._subscription = await Pnwapi.api.subscribe(
+            self._obj._api_name, "update", None, self._subscription_update_callback
         )  # pyright: reportPrivateUsage=false
-        Interface._subscriptions[self._obj._api_name] = subscription
 
     @_raise_if_not_inited
     async def unsubscribe(self) -> None:
-        """Unsubscribe from the API for updates on the given objects."""
-        subscription = Interface._subscriptions.pop(self._obj._api_name, None)
-        if subscription is not None:
-            await subscription.unsubscribe()
+        """Unsubscribe from the API for updates on the given object, if a subscription exists."""
+        if self._subscription is not None:
+            await self._subscription.unsubscribe()
+            self._subscription = None
 
     @_raise_if_not_inited
     async def raw_request(self, endpoint: str, **kwargs: str) -> dict[str, Any]:
@@ -99,6 +94,18 @@ class Interface(Generic[objects.PNWOBJECT]):
             The response from the API.
         """
         ...
+
+    async def _subscription_update_callback(self, data: "pnwkit.data.Data") -> None:
+        """Callback for update events from subscriptions."""
+        await self._obj._update(data)
+
+    async def _subscription_create_callback(self, data: "pnwkit.data.Data") -> None:
+        """Callback for create events from subscriptions."""
+        await self._obj._create(data)
+
+    async def _subscription_delete_callback(self, data: "pnwkit.data.Data") -> None:
+        """Callback for delete events from subscriptions."""
+        await self._obj._delete(data)
 
 
 class PnwapiMeta(type):

@@ -25,8 +25,10 @@ async def test_testing(caplog: pytest.LogCaptureFixture, logger: logging.Logger)
     await pnwapi.nations.filter(name="The United States of America").first()
 
     await pnwapi.nations.subscribe()
-    await asyncio.sleep(1)
+    await asyncio.sleep(15)
     logger.info("1")
-    await pnwapi.close_connections()
+    await pnwapi.nations.unsubscribe()
     logger.info("2")
+    await pnwapi.close_connections()
+    logger.info("3")
     assert 1 == 1
