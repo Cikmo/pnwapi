@@ -1,35 +1,48 @@
 from abc import ABC, abstractmethod
-from typing import TypeVar, TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
+
 import pnwkit.data
+import pnwkit.new
 
 if TYPE_CHECKING:
     from pnwkit.new import SubscriptionModelLiteral
 
 
-PNWOBJECT = TypeVar("PNWOBJECT", bound="PnwObject")
+PNWOBJECT = TypeVar("PNWOBJECT", bound="PnwObject[Any]")
 
 
-class PnwObject(ABC):
+class PnwSubscription(Generic[PNWOBJECT, pnwkit.new.T]):
+    __slots__ = ("_obj", "_dataclass")
+
+    def __init__(self, obj: type[PNWOBJECT], dataclass: type[pnwkit.new.T]):
+        self._obj = obj
+        self._dataclass = dataclass
+
+    async def create(self, data: pnwkit.new.T) -> None:
+        """Create an object in the db with data from the API."""
+        await self._obj._create_or_update(data)  # pyright: reportPrivateUsage=false
+
+    async def update(self, data: pnwkit.new.T) -> None:
+        """Update an object in the db with data from the API."""
+        pass
+
+    async def delete(self, data: pnwkit.new.T) -> None:
+        """Delete an object in the db with data from the API."""
+        pass
+
+
+class PnwObject(ABC, Generic[pnwkit.new.T]):
     """Base class for all PnwObjects."""
 
     __slots__ = ()
     _api_name: "SubscriptionModelLiteral"
-    _api_dataclass: type[pnwkit.data.Data]
 
-    @classmethod
     @abstractmethod
-    async def _update(cls, data: Any) -> None:
-        """Update an object in the db with data from the API."""
+    @classmethod
+    async def _create_or_update(cls, data: pnwkit.new.T) -> None:
         pass
 
-    @classmethod
     @abstractmethod
-    async def _create(cls, data: Any) -> None:
-        """Create an object in the db with data from the API."""
-        pass
-
     @classmethod
-    @abstractmethod
-    async def _delete(cls, data: Any) -> None:
-        """Delete an object in the db with data from the API."""
+    async def _delete(cls, data: pnwkit.new.T) -> None:
         pass

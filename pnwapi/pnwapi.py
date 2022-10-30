@@ -65,12 +65,7 @@ class Interface(Generic[objects.PNWOBJECT]):
 
     @_raise_if_not_inited
     async def subscribe(self) -> None:
-        """Subscribe to the API for updates on the given objects. This will watch for changes to the objects and update the local database,
-        create new objects and remove deleted ones all automatically.
-
-        This is a non-blocking function. It will return immediately and run in the background. To stop the subscription,
-        call the `unsubscribe` method.
-        """
+        """Subscribe to the API for automaticly updating the local database with the data from the API."""
         self._subscription = await Pnwapi.api.subscribe(
             self._obj._api_name, "update", None, self._subscription_update_callback
         )  # pyright: reportPrivateUsage=false
@@ -81,6 +76,14 @@ class Interface(Generic[objects.PNWOBJECT]):
         if self._subscription is not None:
             await self._subscription.unsubscribe()
             self._subscription = None
+
+    async def _subscription_update_callback(self, data: "pnwkit.data.Data") -> None:
+        """Callback for update events from subscriptions."""
+        await self._obj._create_or_update(data)
+
+    async def _subscription_delete_callback(self, data: "pnwkit.data.Data") -> None:
+        """Callback for delete events from subscriptions."""
+        await self._obj._delete(data)
 
     @_raise_if_not_inited
     async def raw_request(self, endpoint: str, **kwargs: str) -> dict[str, Any]:
@@ -94,18 +97,6 @@ class Interface(Generic[objects.PNWOBJECT]):
             The response from the API.
         """
         ...
-
-    async def _subscription_update_callback(self, data: "pnwkit.data.Data") -> None:
-        """Callback for update events from subscriptions."""
-        await self._obj._update(data)
-
-    async def _subscription_create_callback(self, data: "pnwkit.data.Data") -> None:
-        """Callback for create events from subscriptions."""
-        await self._obj._create(data)
-
-    async def _subscription_delete_callback(self, data: "pnwkit.data.Data") -> None:
-        """Callback for delete events from subscriptions."""
-        await self._obj._delete(data)
 
 
 class PnwapiMeta(type):

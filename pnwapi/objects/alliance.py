@@ -8,10 +8,9 @@ if TYPE_CHECKING:
     from pnwapi import query
 
 
-class Alliance(pnwobject.PnwObject):
+class Alliance(pnwobject.PnwObject[pnwkit.data.Alliance]):
     __slots__ = ("id", "name", "members")
     _api_name: "SubscriptionModelLiteral" = "alliance"
-    _api_dataclass = pnwkit.data.Alliance
 
     def __init__(self):
         self.id: int
@@ -19,11 +18,7 @@ class Alliance(pnwobject.PnwObject):
         self.members: "query.PnwQuerySet[nation.Nation]"
 
     @classmethod
-    async def _update(cls, data: pnwkit.data.Alliance) -> None:
-        pass
-
-    @classmethod
-    async def _create(cls, data: pnwkit.data.Alliance) -> None:
+    async def _create_or_update(cls, data: pnwkit.data.Alliance) -> None:
         pass
 
     @classmethod
